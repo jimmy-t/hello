@@ -104,16 +104,6 @@ function updateGameArea() {
 	if (gameover) {
 		return;
 	}
-	
-	if (winners.length > 0) {
-		gameover = true;
-		var winnerNames = "";
-		for (var i = 0; i < winners.length; i++) {
-			winnerNames += winners[i].color + " ";
-		}
-		
-		alert((winners.length == 1 ? "Winner!\n" : "Tie!\n") + winnerNames);
-	}
     myGameArea.clear();
     myGameArea.frameNo += 1;
 	finishLine.update();
@@ -125,6 +115,16 @@ function updateGameArea() {
             winners.push(horse);
         }
     }
+	
+	if (winners.length > 0) {
+		gameover = true;
+		var winnerNames = "";
+		for (var i = 0; i < winners.length; i++) {
+			winnerNames += winners[i].color + " ";
+		}
+		
+		alert((winners.length == 1 ? "Winner!\n" : "Tie!\n") + winnerNames);
+	}
 }
 
 function go() {
