@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+    border:1px solid #d3d3d3;
+    background-color: #00AA00;
+}
+</style>
+</head>
+<!-- Inspired by https://www.w3schools.com/graphics/tryit.asp?filename=trygame_default_gravity -->
+<body onload="startGame()">
+<script>
+
+var horses;
+var winners;
+var gameover;
+var finishLine;
+
+var myGameArea = {
+	canvas : document.createElement("canvas"),
+	start : function() {
+		this.canvas.width = 480;
+		this.canvas.height = 110;
+		this.context = this.canvas.getContext("2d");
+		document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+		this.frameNo = 0;
+		this.interval = setInterval(updateGameArea, 20);
+		},
+	clear : function() {
+		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	}
+};
+
+function startGame() {
+    horses = [
+    	new component(30, 10, "red", 10, 10),
+    	new component(30, 10, "orange", 10, 30),
+    	new component(30, 10, "yellow", 10, 50),
+    	new component(30, 10, "green", 10, 70),
+    	new component(30, 10, "blue", 10, 90)
+    ];
+	winners = [];
+	gameover = false;
+	finishLine = new component(10, 270, "white", 450, 0);
+	myGameArea.start();
+}
+
+function component(width, height, color, x, y, type) {
+    this.type = type;
+    this.score = 0;
+    this.width = width;
+    this.height = height;
+	this.color = color;
+    this.speedX = 0;
+    this.speedY = 0;    
+    this.x = x;
+    this.y = y;
+    this.gravity = 0;
+    this.gravitySpeed = 0;
+    this.update = function() {
+        ctx = myGameArea.context;
+        if (this.type == "text") {
+            ctx.font = this.width + " " + this.height;
+            ctx.fillStyle = color;
+            ctx.fillText(this.text, this.x, this.y);
+        } else {
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
+    }
+    this.newPos = function() {
+        this.gravitySpeed += this.gravity;
+        this.x += this.speedX;
+        this.y += this.speedY + this.gravitySpeed;
+        this.hitBottom();
+    }
+    this.hitBottom = function() {
+        var rockbottom = myGameArea.canvas.height - this.height;
+        if (this.y > rockbottom) {
+            this.y = rockbottom;
+            this.gravitySpeed = 0;
+        }
+    }
+    this.crashWith = function(otherobj) {
+        var myleft = this.x;
+        var myright = this.x + (this.width);
+        var mytop = this.y;
+        var mybottom = this.y + (this.height);
+        var otherleft = otherobj.x;
+        var otherright = otherobj.x + (otherobj.width);
+        var othertop = otherobj.y;
+        var otherbottom = otherobj.y + (otherobj.height);
+        var crash = true;
+        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+            crash = false;
+        }
+        return crash;
+    }
+}
+
+function updateGameArea() {
+	if (gameover) {
+		return;
+	}
+	
+	if (winners.length > 0) {
+		gameover = true;
+		var winnerNames = "";
+		for (var i = 0; i < winners.length; i++) {
+			winnerNames += winners[i].color + " ";
+		}
+		
+		alert((winners.length == 1 ? "Winner!\n" : "Tie!\n") + winnerNames);
+	}
+    myGameArea.clear();
+    myGameArea.frameNo += 1;
+	finishLine.update();
+    for (i = 0; i < horses.length; i += 1) {
+		var horse = horses[i];
+		horse.newPos();
+		horse.update();
+        if (horse.crashWith(finishLine)) {
+            winners.push(horse);
+        }
+    }
+}
+
+function go() {
+    for (i = 0; i < horses.length; i += 1) {
+		var horse = horses[i];
+		horse.x += Math.random() * 10;
+    }
+}
+
+</script>
+<br>
+<button onmousedown="go()" onmouseup=";">GO!!!!!!!</button>
+<button onmousedown="startGame()" onmouseup=";">Again</button>
+</body>
+</html>
