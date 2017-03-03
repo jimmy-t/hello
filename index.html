@@ -15,6 +15,26 @@ canvas {
 </head>
 <!-- Inspired by https://www.w3schools.com/graphics/tryit.asp?filename=trygame_default_gravity -->
 <body onload="startGame()">
+
+		
+<div id="body-container" style="width: 480px;">
+	<div id="game-container" >
+		<div id="canvas-marker">
+		<button id="game-button" style="height:100px; width:100%;" onmousedown="go()" onmouseup=";">GO!!!!!!!</button>
+		<br>
+		<br>
+		<button onmousedown="startGame()" onmouseup=";" style="width: 150px; margin: 2em auto; cursor: pointer; display: block;">Again</button>
+	</div>
+	
+	<div id="youtube-container">
+		<div data-video="BAIlVCStp3c" data-autoplay="1" data-loop="1" id="youtube-audio" style="width: 150px; margin: 2em auto; cursor: pointer; display: block;">
+		<img id="youtube-icon" src="https://i.imgur.com/quyUPXN.png">
+		<iframe id="youtube-player" frameborder="0" allowfullscreen="1" title="YouTube video player" width="0" height="0" src="https://www.youtube.com/embed/BAIlVCStp3c?autoplay=1&amp;loop=1&amp;enablejsapi=1&amp;origin=https%3A%2F%2Fimg.labnol.org&amp;widgetid=1">
+		</iframe>
+		</div>
+	</div>
+</div>
+
 <script>
 
 var horses;
@@ -28,7 +48,7 @@ var myGameArea = {
 		this.canvas.width = 480;
 		this.canvas.height = 110;
 		this.context = this.canvas.getContext("2d");
-		document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+		document.getElementById('canvas-marker').parentNode.insertBefore(this.canvas, document.getElementById('canvas-marker'));
 		this.frameNo = 0;
 		this.interval = setInterval(updateGameArea, 20);
 		},
@@ -141,17 +161,60 @@ function go() {
 }
 
 </script>
-<br>
-<button style="height:100px; width:480px;" onmousedown="go()" onmouseup=";">GO!!!!!!!</button>
-<br>
-<br>
-<button onmousedown="startGame()" onmouseup=";">Again</button>	
-	 <div data-video="BAI1VCStp3c"  
-         data-autoplay="1"         
-         data-loop="1"             
-         id="youtube-audio">
-  </div>
-  <script src="https://www.youtube.com/iframe_api"></script>
-	
+
+<script type="text/javascript" id="www-widgetapi-script" src="https://s.ytimg.com/yts/jsbin/www-widgetapi-vflE2dwbu/www-widgetapi.js" async=""></script>
+<script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
+<script>
+
+  var player;
+  function onYouTubeIframeAPIReady() {
+
+    var ctrlq = document.getElementById("youtube-audio");
+    ctrlq.innerHTML = '<img id="youtube-icon" src=""/><div id="youtube-player"></div>';
+    ctrlq.style.cssText = 'width:150px;margin:2em auto;cursor:pointer;cursor:hand;display:none';
+    ctrlq.onclick = toggleAudio;
+
+    player = new YT.Player('youtube-player', {
+      height: '0',
+      width: '0',
+      videoId: ctrlq.dataset.video,
+      playerVars: {
+        autoplay: ctrlq.dataset.autoplay,
+        loop: ctrlq.dataset.loop,
+      },
+      events: {
+        'onReady': onPlayerReady,
+        'onStateChange': onPlayerStateChange 
+      } 
+    });
+  } 
+
+  function togglePlayButton(play) {    
+    document.getElementById("youtube-icon").src = play ? "https://i.imgur.com/IDzX9gL.png" : "https://i.imgur.com/quyUPXN.png";
+  }
+
+  function toggleAudio() {
+    if ( player.getPlayerState() == 1 || player.getPlayerState() == 3 ) {
+      player.pauseVideo(); 
+      togglePlayButton(false);
+    } else {
+      player.playVideo(); 
+      togglePlayButton(true);
+    } 
+  } 
+
+  function onPlayerReady(event) {
+    player.setPlaybackQuality("small");
+    document.getElementById("youtube-audio").style.display = "block";
+    togglePlayButton(player.getPlayerState() !== 5);
+  }
+
+  function onPlayerStateChange(event) {
+    if (event.data === 0) {
+      togglePlayButton(false); 
+    }
+  }
+
+</script>
 </body>
 </html>
